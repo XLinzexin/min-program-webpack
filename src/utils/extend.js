@@ -6,12 +6,6 @@
 import { parseQueryString } from "@/utils/util";
 import ajax from "@/utils/ajax";
 !(function() {
-	const consoleError = console.error;
-	console.error = function() {
-		console.log(Array.from(arguments).join(""));
-		ajax.post("/errorlog", Array.from(arguments).join(""));
-		consoleError(...Array.from(arguments));
-	};
 	//把需要添加的对象与原对象混合起来,放在原本执行的函数前面
 	function mixinBefore(obj, name, extend) {
 		if (obj[name]) {
