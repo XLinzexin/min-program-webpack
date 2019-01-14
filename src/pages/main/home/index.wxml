@@ -1,0 +1,6 @@
+<wxs src="/wxs/utils.wxs" module="utils" />
+<view>
+  这是小程序的首页
+  <image src="{{utils.image('https://www.xxx.com/picture.jpg')}}" />
+</view>
+<!-- <member-pop /> -->

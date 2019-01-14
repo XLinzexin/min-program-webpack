@@ -1,0 +1,20 @@
+{
+  "pages": ["pages/main/home/index"],
+  "subPackages": [
+    {
+      "root": "pages/order/",
+      "pages": ["list/index"]
+    }
+  ],
+  "usingComponents": {
+    "auth-mask": "components/authMask/index",
+    "list-loader": "components/listLoader/index",
+    "lists-loader": "components/listsLoader/index",
+    "owner-navigator": "components/ownerNavigator/index"
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTextStyle": "black"
+  }
+}

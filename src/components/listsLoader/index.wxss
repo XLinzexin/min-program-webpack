@@ -1,0 +1,120 @@
+@import (css) "/style/common.wxss";
+@import "~style/main.less";
+.lists-loader {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  @tabHeight: 88rpx;
+  .tab-selector {
+    height: @tabHeight;
+    line-height: @tabHeight;
+    position: fixed;
+    left: 4rpx;
+    right: 0;
+    top: 0;
+    display: flex;
+    color: @bg-text-primary;
+    font-size: 24rpx;
+    background: #ffffff;
+    border-bottom: 1rpx solid #cccccc;
+    .tab-item {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888888;
+      font-size: 26rpx;
+      &.active {
+        color: @primary-color;
+      }
+    }
+    .pointer {
+      height: 4rpx;
+      width: 100rpx;
+      background: @primary-color;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      margin-left: -50rpx;
+    }
+  }
+  .swiper-wrapper {
+    padding-top: @tabHeight;
+    height: 100%;
+    .swiper-item {
+      scroll-view {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.loading {
+  height: 100rpx;
+  width: 100%;
+  padding-top: 36rpx;
+  padding-bottom: 16rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: @background-color;
+}
+.loading.start {
+  background: transparent;
+  position: fixed;
+  top: 300rpx;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 0;
+}
+.loading-box {
+  display: flex;
+  width: 100%;
+  opacity: 1;
+  justify-content: center;
+}
+.loading-text {
+  font-size: 20rpx;
+  text-indent: 10rpx;
+  align-items: center;
+  display: flex;
+}
+.loading-animate {
+  transform: translateZ(0);
+  opacity: 1;
+}
+.loading-rotate {
+  width: 44rpx;
+  height: 44rpx;
+  color: @primary-color;
+  position: relative;
+  animation: rotate 1.5s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .iconfont {
+    font-size: 40rpx;
+    width: 40rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+    text-align: center;
+  }
+}
+.loading-reload {
+  display: flex;
+  .iconfont {
+    padding-right: 10rpx;
+  }
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

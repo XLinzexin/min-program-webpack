@@ -1,0 +1,35 @@
+<view class="lists-loader">
+  <view class="tab-selector">
+    <view id="{{'tab' + index}}" wx:for="{{tabList}}" wx:key="index" class="tab-item {{tabIndex === index ? 'active' : ''}}"
+      bindtap="changeTab" data-index="{{index}}">
+      {{item.text}}
+    </view>
+    <view class="pointer" wx:if="{{configEnd}}" style="transition:transform 0.4s ease 0s;transform:translate3d({{tabWidth*(tabIndex+0.5)}}rpx, 0px, 0px);"></view>
+  </view>
+  <swiper class="swiper-wrapper" bindchange="changeSwiper" current="{{tabIndex}}">
+    <swiper-item class="swiper-item" wx:for="{{loaders}}" wx:key="index">
+      <slot name="empty{{index}}" wx:if="{{item.isEmpty}}"></slot>
+      <scroll-view scroll-y bindscrolltolower="reachBottom" data-index="{{index}}" wx:else>
+        <slot name="list{{index}}" />
+        <view wx:if="{{!item.allLoaded}}" class="loading {{item.pageNumber===0?'start':''}}">
+          <view class="loading-box" hidden="{{item.loadError}}">
+            <view class="loading-animate" style="{{item.pageNumber!==0?'transform:translateZ(0) scale(.8)':''}}">
+              <view class="loading-rotate">
+                <view class="icon-loading1 iconfont"></view>
+              </view>
+            </view>
+            <view class="loading-text fc88">
+              努力加载中…
+            </view>
+          </view>
+          <view class="loading-reload" hidden="{{!item.loadError}}" bindtap="reload" data-index="{{index}}">
+            <view class="icon-shuaxin iconfont fccc"></view>
+            <view class="fs24 fc88">出错了呢，
+              <text class="fcmain1">试试重新加载</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+</view>

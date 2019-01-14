@@ -1,0 +1,33 @@
+<!-- components/common/timedown/index.wxml -->
+<view class="list-loader">
+  <slot name="list" wx:if="{{!isEmpty}}"></slot>
+  <view
+    wx:if="{{!allLoaded}}"
+    class="loading {{pageNumber===0&&!nomarl?'start':''}}"
+  >
+    <view class="loading-box" hidden="{{loadError}}">
+      <view
+        class="loading-animate"
+        style="{{pageNumber!==0?'transform:translateZ(0) scale(.8)':''}}"
+      >
+        <view class="loading-rotate">
+          <view class="icon-loading1 iconfont"></view>
+        </view>
+      </view>
+      <view class="loading-text fc88"> 努力加载中…… </view>
+      <!--
+        <view class="loading-text fc88" wx:if="{{pageNumber!==0}}">
+          努力加载中……
+        </view>
+      -->
+    </view>
+    <view class="loading-reload" hidden="{{!loadError}}" bindtap="reload">
+      <view class="icon-shuaxin iconfont fccc"></view>
+      <view class="fs24 fc88"
+        >出错了呢， <text class="fcmain1">试试重新加载</text>
+      </view>
+    </view>
+  </view>
+  <slot name="empty" wx:if="{{isEmpty}}"></slot>
+  <slot name="allLoaded" wx:if="{{allLoaded&&!isEmpty}}"></slot>
+</view>

@@ -1,0 +1,2 @@
+@import "~style/main.less";
+@import (css) "/style/common.wxss";

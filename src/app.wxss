@@ -1,0 +1,57 @@
+/* 引入该文件，文件被引用才会被webpack编译。但是不编译到当前文件，只是单纯引用  */
+@import (reference, optional, less) "style/common.wxss";
+/*  当做css的import使用  */
+@import (css) "style/common.wxss";
+page {
+  background: #ffffff;
+  width: 100%;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+page::after {
+  content: ".";
+  width: 100%;
+  height: 1rpx;
+  background: #d9d9d9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  overflow: hidden;
+}
+view[hidden] {
+  display: none !important;
+}
+/*  scroll样式  */
+scroll-view ::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+
+/*  默认样式  */
+page {
+  font-size: 24rpx;
+}
+image {
+  position: relative;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+page,
+view,
+block,
+image,
+navigator,
+swiper,
+swiper-item,
+scroll-view {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+view.hide {
+  display: none !important;
+}

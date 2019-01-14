@@ -1,0 +1,104 @@
+@import "./main.less";
+@import "./font.less";
+.scroll-H {
+  white-space: nowrap;
+}
+.scroll-H .scroll-item {
+  display: inline-block;
+}
+/*   字体大小及行高   */
+.fs38 {
+  font-size: 38rpx !important;
+  line-height: 54rpx;
+  height: 54rpx;
+}
+.lh38 {
+  line-height: 38rpx !important;
+}
+.fs32 {
+  font-size: 32rpx !important;
+  line-height: 46rpx;
+  height: 46rpx;
+}
+.lh32 {
+  line-height: 32rpx !important;
+}
+.fs28 {
+  font-size: 28rpx !important;
+  line-height: 40rpx;
+  height: 40rpx;
+}
+.lh28 {
+  line-height: 28rpx !important;
+}
+.fs26 {
+  font-size: 26rpx !important;
+  line-height: 36rpx;
+  height: 36rpx;
+}
+.lh26 {
+  line-height: 26rpx !important;
+}
+.fs24 {
+  font-size: 24rpx !important;
+  line-height: 32rpx;
+  height: 32rpx;
+}
+.lh24 {
+  line-height: 24rpx !important;
+}
+.fs22 {
+  font-size: 22rpx !important;
+  line-height: 30rpx;
+  height: 30rpx;
+}
+.lh22 {
+  line-height: 22rpx !important;
+}
+.fcmain1 {
+  color: @primary-color!important;
+}
+.fcmain2 {
+  color: @primary-color!important;
+}
+// .fcmain2 {
+//   color: @secondary-color!important;
+// }
+.fcerror {
+  color: @error-color!important;
+}
+.fclight {
+  color: @error-color!important;
+}
+.fcwarn {
+  color: @warn-color!important;
+}
+.fc44 {
+  color: #444 !important;
+}
+.fc88 {
+  color: #888 !important;
+}
+.fccc {
+  color: #ccc !important;
+}
+/*   圆角   */
+@radius8: 8rpx;
+@radius4: 4rpx;
+//弹窗的圆角
+.popup-radius {
+  border-radius: @radius8;
+}
+//普通容器的圆角
+.box-radius {
+  border-radius: @radius4;
+}
+.clear {
+  &::after {
+    content: ".";
+    color: transparent;
+    height: 0;
+    overflow: hidden;
+    clear: both;
+  }
+}

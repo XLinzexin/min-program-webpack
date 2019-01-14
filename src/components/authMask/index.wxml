@@ -1,0 +1,10 @@
+<view class="auth-box">
+  <block wx:if="{{userInfo}}">
+    <button open-type="getUserInfo" class="mask-button 1" wx:if="{{!getAuth}}" bindgetuserinfo="getUserInfo" lang="zh_CN"></button>
+    <button class="mask-button2 2" wx:else bindtap="runCallBack"></button>
+  </block>
+  <block wx:else>
+    <button open-type="openSetting" class="mask-button 3" wx:if="{{!getAuth&&hasAuth}}" bindopensetting="opensetting"></button>
+    <button class="mask-button 4" wx:else bindtap="toGetScope"></button>
+  </block>
+</view>
