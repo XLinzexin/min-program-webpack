@@ -80,7 +80,7 @@ function base(
 		fn();
 	});
 }
-// 处理舒码所有接口的登录逻辑
+// 处理所有接口的登录逻辑
 function ownerRequest(url, data, method, header, unique) {
 	return new Promise((resolve, reject) => {
 		//写一个闭包，将请求的逻辑缓存下来

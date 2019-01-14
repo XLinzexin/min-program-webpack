@@ -6,7 +6,7 @@ Page({
 		this.emitData(res.data);
 	},
 	onLoad() {
-		this.receiveData(data => {
+		this.recieveData(data => {
 			console.log(data);
 		});
 	}
