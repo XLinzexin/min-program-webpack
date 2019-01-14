@@ -22,27 +22,10 @@ Component({
 		navigateType: function(openType, url) {
 			switch (openType) {
 				case "navigate":
-					wx.navigateTo({
-						url: url
-					});
-					break;
 				case "redirect":
-					wx.redirectTo({
-						url: url
-					});
-					break;
 				case "switchTab":
-					wx.switchTab({
-						url: url
-					});
-					break;
 				case "reLaunch":
-					wx.reLaunch({
-						url: url
-					});
-					break;
-				case "navigateBack":
-					wx.navigateBack({
+					wx[openType]({
 						url: url
 					});
 					break;
