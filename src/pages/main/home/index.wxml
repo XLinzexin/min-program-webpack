@@ -2,5 +2,8 @@
 <view>
   这是小程序的首页
   <image src="{{utils.image('https://www.xxx.com/picture.jpg')}}" />
+  <button style="position:relative;">
+    <owner-navigator url="/pages/order/list/index" />
+    123
+  </button>
 </view>
-<!-- <member-pop /> -->

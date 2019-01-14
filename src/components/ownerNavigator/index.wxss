@@ -1,2 +1,9 @@
-@import "~style/main.less";
-@import (css) "/style/common.wxss";
+/* components/common/aldNavigetor/index.wxss */
+.full-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999;
+}

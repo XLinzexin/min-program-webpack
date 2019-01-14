@@ -1,6 +1,9 @@
 <wxs src="/wxs/utils.wxs" module="utils" />
 <lists-loader id="listsLoader" bind:render="renderList">
   <view slot="list{{listIndex}}" wx:for="{{lists}}" wx:for-item="list" wx:for-index="listIndex" wx:key="listIndex" class="order-list">
+    <view wx:for="{{list}}">
+      {{index}}
+    </view>
   </view>
   <view slot="empty{{listIndex}}" wx:for="{{lists}}" wx:for-item="list" wx:for-index="listIndex" wx:key="listIndex" class="empty-status3">
     <view class="text">

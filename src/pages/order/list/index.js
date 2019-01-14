@@ -56,32 +56,8 @@ Page({
 	renderList: function(e) {
 		let list = e.detail.list;
 		let index = e.detail.index;
-		const orderStatus = [
-			"待付款",
-			"待发货",
-			"配送中",
-			"已完成",
-			"已关闭",
-			"已取消",
-			"退款"
-		];
-		const canDeliveryStatus = [2, 3];
-		const canInvoiceStatus = [1, 2, 3];
-		list.forEach(item => {
-			item.statusText = orderStatus[item.status];
-			item.canDelivery = canDeliveryStatus.includes(item.status);
-			item.canInvoice = canInvoiceStatus.includes(item.status);
-		});
 		this.setData({
 			[`lists[${index}]`]: this.data.lists[index].concat(list)
 		});
-	},
-	pay(e) {
-		const { order } = e.currentTarget.dataset;
-		payAction.payOrder({ data: order });
-	},
-	toDelivery(e) {
-		const { id } = e.currentTarget.dataset;
-		deliveryAction.toDelivery(id);
 	}
 });
