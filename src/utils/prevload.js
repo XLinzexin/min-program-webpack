@@ -19,7 +19,7 @@ function navigateRoute(url) {
 // 获取用户进入的第一个页面
 const firstPage = {};
 const AppBackup = App;
-// 让onlaunch执行第一个页面的prevload
+// 让onlaunch记录第一个页面
 App = function(obj) {
 	const onLaunch = obj.onLaunch;
 	obj.onLaunch = function(data) {
@@ -33,38 +33,37 @@ App = function(obj) {
 const PagesMap = {};
 const PageBackup = Page;
 Page = function(obj) {
-	if (obj.route) {
+	if (obj.prevLoad && obj.route) {
 		PagesMap[obj.route] = obj;
 		if (firstPage.path === obj.route) {
 			checkRoute(firstPage);
 		}
+		let prevLoadData = null;
+		let prevLoadRecieve = null;
+		let prevLoaded = false;
+		obj.emitData = function(data) {
+			prevLoadData = data;
+			if (prevLoadRecieve && !prevLoaded) {
+				prevLoadRecieve(prevLoadData);
+				prevLoaded = true;
+			}
+		};
+		obj.recieveData = function(recieve) {
+			prevLoadRecieve = recieve;
+			if (prevLoadData && !prevLoaded) {
+				prevLoadRecieve(prevLoadData);
+				prevLoaded = true;
+			}
+		};
+		const onUnload = obj.onUnload;
+		obj.onUnload = function() {
+			prevLoadData = null;
+			prevLoadRecieve = null;
+			if (typeof onUnload === "function") {
+				onUnload.call(this);
+			}
+		};
 	}
-	let prevLoadData = null;
-	let prevLoadRecieve = null;
-	let prevLoaded = false;
-	obj.emitData = function(data) {
-		prevLoadData = data;
-		if (prevLoadRecieve && !prevLoaded) {
-			prevLoadRecieve(prevLoadData);
-			prevLoaded = true;
-		}
-	};
-	obj.recieveData = function(recieve) {
-		prevLoadRecieve = recieve;
-		if (prevLoadData && !prevLoaded) {
-			prevLoadRecieve(prevLoadData);
-			prevLoaded = true;
-		}
-	};
-	const onUnload = obj.onUnload;
-	obj.onUnload = function(data) {
-		prevLoadData = null;
-		prevLoadRecieve = null;
-		if (typeof onUnload === "function") {
-			onUnload.call(this);
-		}
-	};
-
 	PageBackup(obj);
 };
 // 匹配路由
@@ -76,6 +75,6 @@ function checkRoute(data) {
 			const obj = parseQueryString(decodeURIComponent(q));
 			query = Object.assign(query, obj);
 		}
-		PagesMap[path].prevLoad({ options: query });
+		PagesMap[path].prevLoad(query);
 	}
 }
