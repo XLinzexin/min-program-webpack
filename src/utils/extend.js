@@ -4,7 +4,6 @@
  * 2.使用装饰者模式,修改调用Page方法和Component方法传入的参数,达到全局修改的目的
  */
 import { parseQueryString } from "@/utils/util";
-import ajax from "@/utils/ajax";
 !(function() {
 	//把需要添加的对象与原对象混合起来,放在原本执行的函数前面
 	function mixinBefore(obj, name, extend) {

@@ -216,18 +216,18 @@ class resObject {
 		this.data = res.data;
 		this.msg = res.msg;
 	}
-}
-resObject.prototype.filterData = function(filterFunc) {
-	try {
-		const { code, data, msg } = this;
-		const newRes = filterFunc({ code, data, msg });
-		this.code = newRes.code;
-		this.data = newRes.data;
-		this.msg = newRes.msg;
-	} catch (err) {
-		console.log(err);
+	filterData(filterFunc) {
+		try {
+			const { code, data, msg } = this;
+			const newRes = filterFunc({ code, data, msg });
+			this.code = newRes.code;
+			this.data = newRes.data;
+			this.msg = newRes.msg;
+		} catch (err) {
+			console.log(err);
+		}
 	}
-};
+}
 export default {
 	base,
 	get,
