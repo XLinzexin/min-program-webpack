@@ -1,5 +1,5 @@
 {
-  "pages": ["pages/main/home/index"],
+  "pages": ["pages/main/home/index", "pages/main/user/index"],
   "subPackages": [
     {
       "root": "pages/order/",
@@ -11,6 +11,19 @@
     "list-loader": "components/listLoader/index",
     "lists-loader": "components/listsLoader/index",
     "owner-navigator": "components/ownerNavigator/index"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      {
+        "pagePath": "pages/main/home/index",
+        "text": "组件"
+      },
+      {
+        "pagePath": "pages/main/user/index",
+        "text": "接口"
+      }
+    ]
   },
   "window": {
     "backgroundTextStyle": "light",

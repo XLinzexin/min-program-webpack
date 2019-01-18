@@ -51,3 +51,26 @@ export const parseQueryString = function(url) {
 	}
 	return ret;
 };
+export const compareVersion = function(localVersion, targetVersion) {
+	const localVersionArr = localVersion.split(".");
+	const targetVersionArr = targetVersion.split(".");
+	const versionLength = 3;
+	if (
+		localVersionArr.length === targetVersionArr.length &&
+		targetVersionArr.length === versionLength
+	) {
+		for (let i = 0; i < versionLength; i++) {
+			const localDivision = Number(localVersionArr[i]);
+			const targetDivision = Number(targetVersionArr[i]);
+			if (localDivision > targetDivision) {
+				return 1;
+			} else if (localDivision < targetDivision) {
+				return -1;
+			} else if (i === versionLength - 1) {
+				return 0;
+			}
+		}
+	} else {
+		console.warn("version is ilegal");
+	}
+};

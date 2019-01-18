@@ -4,6 +4,7 @@
  */
 import ajax from "@/utils/ajax";
 import { USER_INFO } from "@/utils/constant";
+import { compareVersion } from "@/utils/util";
 
 /**
  * 获取购物车信息
@@ -78,7 +79,15 @@ function timeoutFuncQueue() {
 	}, 6000);
 }
 
+function hideTabBar() {
+	const sysInfo = wx.getSystemInfoSync();
+	if (compareVersion(sysInfo.SDKVersion, "2.5.0") >= 0) {
+		wx.hideTabBar();
+	}
+}
+
 export const globalAction = {
 	updateUserInfo,
-	timeoutFuncQueue
+	timeoutFuncQueue,
+	hideTabBar
 };

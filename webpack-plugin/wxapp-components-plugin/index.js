@@ -309,6 +309,9 @@ export default class WXAppPlugin {
 		}
 		this.pageChildrenList = [...pagesJSON, ...componentsJSON];
 
+		if (appJSON.tabBar && appJSON.tabBar.custom) {
+			globalComponets.push("custom-tab-bar/index");
+		}
 		return ["app", ...pages, ...Array.from(components), ...globalComponets];
 	}
 
@@ -456,7 +459,6 @@ export default class WXAppPlugin {
 				// eslint-disable-next-line max-len
 				let injectContent = `; function webpackJsonp() { require("./${posixPath}"); ${globalVar}.webpackJsonp.apply(null, arguments); }`;
 
-				// console.log(this.pages);
 				if (source.indexOf(injectContent) < 0) {
 					const pagePath = name.replace(/\\/g, "/");
 					if (this.pages.includes(pagePath)) {

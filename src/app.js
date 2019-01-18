@@ -5,6 +5,7 @@ import { globalAction, payAction } from "@/utils/app_action";
 import { version } from "@/utils/constant";
 App({
 	onLaunch(options) {
+		// wx.hideTabBar();
 		console.log(`该小程序的版本号是${version}`);
 		this.options = options;
 		this.clearOldSession();
@@ -12,6 +13,7 @@ App({
 			// 延迟更新用户信息
 			globalAction.updateUserInfo();
 		});
+		// globalAction.hideTabBar();
 	},
 	onShow() {
 		if (wx.getUpdateManager) {
