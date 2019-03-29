@@ -1,4 +1,4 @@
 Component({
 	properties: {},
-	attached() {}
+	attached() {},
 });

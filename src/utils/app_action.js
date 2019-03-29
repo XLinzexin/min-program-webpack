@@ -46,18 +46,18 @@ function updateUserInfo() {
 						rawData: userInfoRes.rawData,
 						signature: userInfoRes.signature,
 					});
-					if (res.code) throw '授权失败！';
+					if (res.code) throw new Error('授权失败！');
 					const data = res.data;
 					if (data.wechatOpenId) {
 						wx.setStorageSync(USER_INFO, data);
 						resolve();
 					}
 				}
- catch (err) {
+				catch (err) {
 					wx.showModal({
 						title: '授权失败！',
 					});
-					reject();
+					reject(err);
 				}
 			},
 		});

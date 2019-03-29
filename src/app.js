@@ -39,8 +39,8 @@ App({
 	},
 	// 新版本上线，清除旧版本的session
 	clearOldSession() {
-		const version = wx.getStorageSync('version');
-		if (version !== version) {
+		const nowVersion = wx.getStorageSync('version');
+		if (version !== nowVersion) {
 			wx.clearStorageSync();
 			wx.setStorageSync('version', version);
 		}

@@ -32,7 +32,7 @@ function base(
 				});
 				return;
 			}
- else {
+			else {
 				uniqueRequestPool[uniqueRequestKey] = true;
 			}
 		}
@@ -47,7 +47,7 @@ function base(
 					method: method,
 					success: (reponse) => {
 						const res = reponse.data;
-						resolve(new resObject(res));
+						resolve(new ResObject(res));
 					},
 					fail(e) {
 						reject(e);
@@ -74,7 +74,7 @@ function base(
 					},
 				});
 			}
- else {
+			else {
 				// 请求数满了，等待中
 				pendingRequestPool.push(fn);
 			}
@@ -102,7 +102,7 @@ function ownerRequest(url, data, method, header, unique) {
 						// 未登录，把请求丢进等待登录的缓存池中
 						pendingLoginPool.push({ fn, resolve });
 					}
- else {
+					else {
 						resolve(res);
 						if (typeof resolve2 === 'function') {
 							resolve2(res);
@@ -112,7 +112,9 @@ function ownerRequest(url, data, method, header, unique) {
 				(err) => {
 					reject(err);
 				},
-			);
+			).catch((err) => {
+				console.error(err);
+			});
 		};
 		fn();
 	});
@@ -192,7 +194,7 @@ function login() {
 	try {
 		wx.removeStorageSync(TOKEN);
 	}
- catch (e) {
+	catch (e) {
 		console.log('removeStorageSync fail: ' + e);
 	}
 	wx.login({
@@ -208,14 +210,14 @@ function login() {
 				pendingLoginPool.splice(0, 999);
 				return true;
 			}
- else {
+			else {
 				return false;
 			}
 		},
 	});
 }
 // 把返回的数据使用的类，可以对数据进行过滤等
-class resObject {
+class ResObject {
 	constructor(res) {
 		this.code = res.code;
 		this.data = res.data;
@@ -229,7 +231,7 @@ class resObject {
 			this.data = newRes.data;
 			this.msg = newRes.msg;
 		}
- catch (err) {
+		catch (err) {
 			console.log(err);
 		}
 	}
