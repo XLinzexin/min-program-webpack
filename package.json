@@ -1,26 +1,16 @@
 {
-  "name": "wxapp-boilerplate",
+  "name": "wxapp-cli",
   "version": "0.0.0",
-  "description": "mini program dev boilerplate, supports wechat and alipay",
+  "description": "",
   "private": true,
   "scripts": {
     "start": "webpack --watch --progress",
     "dev": "webpack --watch --progress",
-    "webpack": "webpack",
-    "deprecate:watch": "echo \"'watch' is deprecated, please use 'start' instead\"",
-    "watch": "run-s deprecate:watch start",
-    "prestart": "rimraf dist",
-    "prebuild": "rimraf dist",
     "build": "cross-env NODE_ENV=production webpack --env.target=Wechat --env.min",
-    "lint:watch": "cross-env LINT=true run-s start",
-    "lint:build": "cross-env LINT=true run-s build",
-    "prettier": "prettier-eslint --write \"+(src|test)/**/*.js\"",
-    "create-page": "create-wxapp-page --type=page --dir=src --indent=2 --style=wxss --json=true",
-    "create-component": "create-wxapp-page --type=component --dir=src --indent=tab --style=wxss --json=true",
     "test": "jest"
   },
-  "main": "dist/wechat/app.js",
-  "author": "cap32",
+  "main": "dist/app.js",
+  "author": "xlinzexin",
   "license": "MIT",
   "engines": {
     "node": ">=4"

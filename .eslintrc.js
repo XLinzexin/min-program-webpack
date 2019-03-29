@@ -1,7 +1,7 @@
 module.exports = {
-  root: true,
-  parserOptions: {
-    parser: "babel-eslint"
+  "root": true,
+  "parserOptions": {
+    "parser": "babel-eslint"
   },
   "extends": ["cantonjs"],
   "globals": {
