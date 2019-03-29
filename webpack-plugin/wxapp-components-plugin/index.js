@@ -4,18 +4,18 @@ import {
 	existsSync,
 	stat,
 	readFile,
-	readdir
-} from "fs-extra";
-import { resolve, dirname, relative, join, parse } from "path";
-import { optimize, LoaderTargetPlugin, JsonpTemplatePlugin } from "webpack";
-import { ConcatSource } from "webpack-sources";
-import globby from "globby";
-import { defaults, values, uniq } from "lodash";
-import MultiEntryPlugin from "webpack/lib/MultiEntryPlugin";
-import SingleEntryPlugin from "webpack/lib/SingleEntryPlugin";
-import FunctionModulePlugin from "webpack/lib/FunctionModulePlugin";
-import NodeSourcePlugin from "webpack/lib/node/NodeSourcePlugin";
-import { K } from "handlebars";
+	readdir,
+} from 'fs-extra';
+import { resolve, dirname, relative, join, parse } from 'path';
+import { optimize, LoaderTargetPlugin, JsonpTemplatePlugin } from 'webpack';
+import { ConcatSource } from 'webpack-sources';
+import globby from 'globby';
+import { defaults, values, uniq } from 'lodash';
+import MultiEntryPlugin from 'webpack/lib/MultiEntryPlugin';
+import SingleEntryPlugin from 'webpack/lib/SingleEntryPlugin';
+import FunctionModulePlugin from 'webpack/lib/FunctionModulePlugin';
+import NodeSourcePlugin from 'webpack/lib/node/NodeSourcePlugin';
+import { K } from 'handlebars';
 
 const { CommonsChunkPlugin } = optimize;
 
@@ -24,27 +24,27 @@ const deprecated = function deprecated(obj, key, adapter, explain) {
 		return;
 	}
 	const val = obj[key];
-	if (typeof val === "undefined") {
+	if (typeof val === 'undefined') {
 		return;
 	}
 	deprecated.warned.add(key);
 	adapter(val);
-	console.warn("[WXAppPlugin]", explain);
+	console.warn('[WXAppPlugin]', explain);
 };
 deprecated.warned = new Set();
 
-const stripExt = path => {
+const stripExt = (path) => {
 	const { dir, name } = parse(path);
 	return join(dir, name);
 };
 
-const miniProgramTarget = compiler => {
+const miniProgramTarget = (compiler) => {
 	const { options } = compiler;
 	compiler.apply(
 		new JsonpTemplatePlugin(options.output),
 		new FunctionModulePlugin(options.output),
 		new NodeSourcePlugin(options.node),
-		new LoaderTargetPlugin("web")
+		new LoaderTargetPlugin('web'),
 	);
 };
 
@@ -54,7 +54,7 @@ export const Targets = {
 	},
 	Alipay(compiler) {
 		return miniProgramTarget(compiler);
-	}
+	},
 };
 
 export default class WXAppPlugin {
@@ -64,28 +64,28 @@ export default class WXAppPlugin {
 			include: [],
 			exclude: [],
 			dot: false, // Include `.dot` files
-			extensions: [".js"],
-			commonModuleName: "common.js",
+			extensions: ['.js'],
+			commonModuleName: 'common.js',
 			enforceTarget: true,
-			assetsChunkName: "__assets_chunk_name__"
+			assetsChunkName: '__assets_chunk_name__',
 			// base: undefined,
 		});
 
 		deprecated(
 			this.options,
-			"scriptExt",
-			val => this.options.extensions.unshift(val),
-			"Option `scriptExt` is deprecated. Please use `extensions` instead"
+			'scriptExt',
+			(val) => this.options.extensions.unshift(val),
+			'Option `scriptExt` is deprecated. Please use `extensions` instead',
 		);
 
 		deprecated(
 			this.options,
-			"forceTarge",
-			val => (this.options.enforceTarget = val),
-			"Option `forceTarge` is deprecated. Please use `enforceTarget` instead"
+			'forceTarge',
+			(val) => (this.options.enforceTarget = val),
+			'Option `forceTarge` is deprecated. Please use `enforceTarget` instead',
 		);
 
-		this.options.extensions = uniq([...this.options.extensions, ".js"]);
+		this.options.extensions = uniq([...this.options.extensions, '.js']);
 		this.options.include = [].concat(this.options.include);
 		this.options.exclude = [].concat(this.options.exclude);
 		this.globalComponets = {};
@@ -98,22 +98,22 @@ export default class WXAppPlugin {
 		this.enforceTarget(compiler);
 
 		compiler.plugin(
-			"run",
-			this.try(async compiler => {
+			'run',
+			this.try(async (compiler) => {
 				await this.run(compiler);
-			})
+			}),
 		);
 
 		compiler.plugin(
-			"watch-run",
-			this.try(async compiler => {
+			'watch-run',
+			this.try(async (compiler) => {
 				await this.run(compiler.compiler);
-			})
+			}),
 		);
 
 		compiler.plugin(
-			"emit",
-			this.try(async compilation => {
+			'emit',
+			this.try(async (compilation) => {
 				if (clear && isFirst) {
 					isFirst = false;
 					await this.clear(compilation);
@@ -147,22 +147,23 @@ export default class WXAppPlugin {
 				// 		};
 				// 	}
 				// }
-			})
+			}),
 		);
 
 		compiler.plugin(
-			"after-emit",
-			this.try(async compilation => {
+			'after-emit',
+			this.try(async (compilation) => {
 				await this.toAddTabBarIconsDependencies(compilation);
-			})
+			}),
 		);
 	}
 
-	try = handler => async (arg, callback) => {
+	try = (handler) => async (arg, callback) => {
 		try {
 			await handler(arg);
 			callback();
-		} catch (err) {
+		}
+		catch (err) {
 			callback(err);
 		}
 	};
@@ -193,29 +194,29 @@ export default class WXAppPlugin {
 		const { context, entry } = compilerOptions;
 
 		const getEntryFromCompiler = () => {
-			if (typeof entry === "string") {
+			if (typeof entry === 'string') {
 				return entry;
 			}
 
 			const extRegExpStr = extensions
-				.map(ext => ext.replace(/\./, "\\."))
-				.map(ext => `(${ext})`)
-				.join("|");
+				.map((ext) => ext.replace(/\./, '\\.'))
+				.map((ext) => `(${ext})`)
+				.join('|');
 
 			const appJSRegExp = new RegExp(`\\bapp(${extRegExpStr})?$`);
-			const findAppJS = arr => arr.find(path => appJSRegExp.test(path));
+			const findAppJS = (arr) => arr.find((path) => appJSRegExp.test(path));
 
 			if (Array.isArray(entry)) {
 				return findAppJS(entry);
 			}
-			if (typeof entry === "object") {
+			if (typeof entry === 'object') {
 				for (const key in entry) {
 					if (!entry.hasOwnProperty(key)) {
 						continue;
 					}
 
 					const val = entry[key];
-					if (typeof val === "string") {
+					if (typeof val === 'string') {
 						return val;
 					}
 					if (Array.isArray(val)) {
@@ -251,14 +252,14 @@ export default class WXAppPlugin {
 
 	async toEmitTabBarIcons(compilation) {
 		const emitIcons = [];
-		this.tabBarIcons.forEach(iconPath => {
+		this.tabBarIcons.forEach((iconPath) => {
 			const iconSrc = resolve(this.base, iconPath);
 			const toEmitIcon = async () => {
 				const iconStat = await stat(iconSrc);
 				const iconSource = await readFile(iconSrc);
 				compilation.assets[iconPath] = {
 					size: () => iconStat.size,
-					source: () => iconSource
+					source: () => iconSource,
 				};
 			};
 			emitIcons.push(toEmitIcon());
@@ -268,7 +269,7 @@ export default class WXAppPlugin {
 
 	toAddTabBarIconsDependencies(compilation) {
 		const { fileDependencies } = compilation;
-		this.tabBarIcons.forEach(iconPath => {
+		this.tabBarIcons.forEach((iconPath) => {
 			if (!~fileDependencies.indexOf(iconPath)) {
 				fileDependencies.push(iconPath);
 			}
@@ -276,7 +277,7 @@ export default class WXAppPlugin {
 	}
 
 	async getEntryResource() {
-		const appJSONFile = resolve(this.base, "app.json");
+		const appJSONFile = resolve(this.base, 'app.json');
 		const appJSON = await readJson(appJSONFile);
 		const { pages = [], subPackages = [], tabBar = {} } = appJSON;
 		this.globalComponets = appJSON.usingComponents || {};
@@ -296,10 +297,10 @@ export default class WXAppPlugin {
 		}
 
 		this.getTabBarIcons(tabBar);
-		const componentsJSON = Array.from(components).map(item => {
-			return `${item.replace(/\\/g, "/")}.json`;
+		const componentsJSON = Array.from(components).map((item) => {
+			return `${item.replace(/\\/g, '/')}.json`;
 		});
-		const pagesJSON = pages.map(item => {
+		const pagesJSON = pages.map((item) => {
 			return `${item}.json`;
 		});
 		// 全局组件
@@ -310,19 +311,19 @@ export default class WXAppPlugin {
 		this.pageChildrenList = [...pagesJSON, ...componentsJSON];
 
 		if (appJSON.tabBar && appJSON.tabBar.custom) {
-			globalComponets.push("custom-tab-bar/index");
+			globalComponets.push('custom-tab-bar/index');
 		}
-		return ["app", ...pages, ...Array.from(components), ...globalComponets];
+		return ['app', ...pages, ...Array.from(components), ...globalComponets];
 	}
 
 	async getComponents(components, instance) {
 		const { usingComponents = {} } =
 			(await readJson(`${instance}.json`).catch(
-				err => err && err.code !== "ENOENT" && console.error(err)
+				(err) => err && err.code !== 'ENOENT' && console.error(err),
 			)) || {};
 		const componentBase = parse(instance).dir;
 		for (const relativeComponent of values(usingComponents)) {
-			if (relativeComponent.indexOf("plugin://") === 0) continue;
+			if (relativeComponent.indexOf('plugin://') === 0) continue;
 			const component = resolve(componentBase, relativeComponent);
 			if (!components.has(component)) {
 				components.add(relative(this.base, component));
@@ -334,7 +335,7 @@ export default class WXAppPlugin {
 	getFullScriptPath(path) {
 		const {
 			base,
-			options: { extensions }
+			options: { extensions },
 		} = this;
 		for (const ext of extensions) {
 			const fullPath = resolve(base, path + ext);
@@ -356,13 +357,12 @@ export default class WXAppPlugin {
 	async compileAssets(compiler) {
 		const {
 			options: { include, exclude, dot, assetsChunkName, extensions },
-			entryResources
+			entryResources,
 		} = this;
-
-		compiler.plugin("compilation", compilation => {
-			compilation.plugin("before-chunk-assets", () => {
+		compiler.plugin('compilation', (compilation) => {
+			compilation.plugin('before-chunk-assets', () => {
 				const assetsChunkIndex = compilation.chunks.findIndex(
-					({ name }) => name === assetsChunkName
+					({ name }) => name === assetsChunkName,
 				);
 				if (assetsChunkIndex > -1) {
 					compilation.chunks.splice(assetsChunkIndex, 1);
@@ -371,18 +371,17 @@ export default class WXAppPlugin {
 		});
 
 		const patterns = entryResources
-			.map(resource => `${resource}.*`)
+			.map((resource) => `${resource}.*`)
 			.concat(include);
 
 		const entries = await globby(patterns, {
 			cwd: this.base,
 			nodir: true,
 			realpath: true,
-			ignore: [...extensions.map(ext => `**/*${ext}`), ...exclude],
-			dot
+			ignore: [...extensions.map((ext) => `**/*${ext}`), ...exclude],
+			dot,
 		});
-
-		const extJsonPath = resolve(this.base, "ext.json");
+		const extJsonPath = resolve(this.base, 'ext.json');
 		if (existsSync(extJsonPath)) {
 			entries.push(extJsonPath);
 		}
@@ -395,22 +394,21 @@ export default class WXAppPlugin {
 		}
 
 		const {
-			options: { extensions }
+			options: { extensions },
 		} = this;
 		const exts = extensions
-			.map(ext => ext.replace(/\./g, "\\."))
-			.map(ext => `(${ext}$)`)
-			.join("|");
+			.map((ext) => ext.replace(/\./g, '\\.'))
+			.map((ext) => `(${ext}$)`)
+			.join('|');
 		return new RegExp(exts);
 	}
 
 	applyCommonsChunk(compiler) {
 		const {
 			options: { commonModuleName },
-			entryResources
+			entryResources,
 		} = this;
-
-		const scripts = entryResources.map(::this.getFullScriptPath);
+		const scripts = entryResources.map(this.getFullScriptPath.bind(this));
 
 		compiler.apply(
 			new CommonsChunkPlugin({
@@ -421,13 +419,13 @@ export default class WXAppPlugin {
 						return regExp.test(resource) && scripts.indexOf(resource) < 0;
 					}
 					return false;
-				}
-			})
+				},
+			}),
 		);
 	}
 
 	addScriptEntry(compiler, entry, name) {
-		compiler.plugin("make", (compilation, callback) => {
+		compiler.plugin('make', (compilation, callback) => {
 			const dep = SingleEntryPlugin.createDependency(entry, name);
 			compilation.addEntry(this.base, dep, name, callback);
 		});
@@ -436,9 +434,13 @@ export default class WXAppPlugin {
 	compileScripts(compiler) {
 		this.applyCommonsChunk(compiler);
 		this.entryResources
-			.filter(resource => resource !== "app" && resource !== undefined)
-			.forEach(resource => {
+			.filter((resource) => resource !== 'app' && resource !== undefined)
+			.forEach((resource) => {
 				const fullPath = this.getFullScriptPath(resource);
+				if (!fullPath) {
+					console.error(`${resource} is no exists`);
+					throw new Error(`${resource} is no exists`);
+				}
 				this.addScriptEntry(compiler, fullPath, resource);
 			});
 	}
@@ -447,23 +449,23 @@ export default class WXAppPlugin {
 		const { commonModuleName } = this.options;
 		const { target } = compilation.options;
 		const commonChunkName = stripExt(commonModuleName);
-		const globalVar = "global";
+		const globalVar = 'global';
 
 		// inject chunk entries
-		compilation.chunkTemplate.plugin("render", (core, { name }) => {
+		compilation.chunkTemplate.plugin('render', (core, { name }) => {
 			if (this.entryResources.indexOf(name) >= 0) {
 				const relativePath = relative(dirname(name), `./${commonModuleName}`);
-				const posixPath = relativePath.replace(/\\/g, "/");
+				const posixPath = relativePath.replace(/\\/g, '/');
 				let source = core.source();
 
 				// eslint-disable-next-line max-len
 				let injectContent = `; function webpackJsonp() { require("./${posixPath}"); ${globalVar}.webpackJsonp.apply(null, arguments); }`;
 
 				if (source.indexOf(injectContent) < 0) {
-					const pagePath = name.replace(/\\/g, "/");
+					const pagePath = name.replace(/\\/g, '/');
 					if (this.pages.includes(pagePath)) {
-						const targetText = "Page({";
-						source = source.replace(targetText, function() {
+						const targetText = 'Page({';
+						source = source.replace(targetText, function () {
 							return `${targetText}route:'${pagePath}',`;
 						});
 					}
@@ -476,8 +478,8 @@ export default class WXAppPlugin {
 		});
 
 		// replace `window` to `global` in common chunk
-		compilation.mainTemplate.plugin("bootstrap", (source, chunk) => {
-			const windowRegExp = new RegExp("window", "g");
+		compilation.mainTemplate.plugin('bootstrap', (source, chunk) => {
+			const windowRegExp = new RegExp('window', 'g');
 			if (chunk.name === commonChunkName) {
 				return source.replace(windowRegExp, globalVar);
 			}
@@ -486,36 +488,36 @@ export default class WXAppPlugin {
 
 		// override `require.ensure()`
 		compilation.mainTemplate.plugin(
-			"require-ensure",
-			() => 'throw new Error("Not chunk loading available");'
+			'require-ensure',
+			() => 'throw new Error("Not chunk loading available");',
 		);
 	}
 
 	async run(compiler) {
 		this.base = this.getBase(compiler);
 		this.entryResources = await this.getEntryResource();
-		compiler.plugin("compilation", ::this.toModifyTemplate);
+		compiler.plugin('compilation', this.toModifyTemplate.bind(this));
 		this.compileScripts(compiler);
 		await this.compileAssets(compiler);
 	}
 	async fileDisplay(filePath, callback) {
-		//根据文件路径读取文件，返回文件列表
+		// 根据文件路径读取文件，返回文件列表
 		const files = await readdir(filePath);
 		var blogList = [];
 		if (files && files.length) {
 			for (let filename of files) {
 				const filedir = join(filePath, filename);
-				//根据文件路径获取文件信息，返回一个stat对象
+				// 根据文件路径获取文件信息，返回一个stat对象
 				const stats = await stat(filedir);
-				const isFile = stats.isFile(); //是文件
-				const isDir = stats.isDirectory(); //是文件夹
+				const isFile = stats.isFile(); // 是文件
+				const isDir = stats.isDirectory(); // 是文件夹
 				if (isFile) {
 					if (filedir) {
 						callback(filedir);
 					}
 				}
 				if (isDir) {
-					await this.fileDisplay(filedir, callback); //递归，如果是文件夹，就继续遍历该文件夹下面的文件
+					await this.fileDisplay(filedir, callback); // 递归，如果是文件夹，就继续遍历该文件夹下面的文件
 				}
 			}
 		}

@@ -1,4 +1,8 @@
-{
+module.exports = {
+  root: true,
+  parserOptions: {
+    parser: "babel-eslint"
+  },
   "extends": ["cantonjs"],
   "globals": {
     "__DEV__": true,
@@ -17,5 +21,5 @@
         "config": "webpack.config.babel.js"
       }
     }
-  }
+  },
 }
