@@ -2,57 +2,57 @@ Component({
 	properties: {
 		openType: {
 			type: String,
-			value: "navigate"
+			value: 'navigate',
 		},
 		url: {
 			type: String,
-			value: ""
-		}
+			value: '',
+		},
 	},
 	data: {
 		active: false,
-		pending: false
+		pending: false,
 	},
 	methods: {
 		// 这里是一个自定义方法
-		ownerNavigate: function() {
+		ownerNavigate: function () {
 			const { openType, url } = this.properties;
 			this.navigateType(openType, url);
 		},
-		navigateType: function(openType, url) {
+		navigateType: function (openType, url) {
 			switch (openType) {
-				case "navigate":
+				case 'navigate':
 					wx.navigateTo({
-						url: url
+						url: url,
 					});
 					break;
-				case "redirect":
+				case 'redirect':
 					wx.redirectTo({
-						url: url
+						url: url,
 					});
 					break;
-				case "switchTab":
+				case 'switchTab':
 					wx.switchTab({
-						url: url
+						url: url,
 					});
 					break;
-				case "reLaunch":
+				case 'reLaunch':
 					wx.reLaunch({
-						url: url
+						url: url,
 					});
 					break;
-				case "navigateBack":
+				case 'navigateBack':
 					wx.navigateBack({
-						url: url
+						url: url,
 					});
 					break;
-				case "none":
+				case 'none':
 					break;
 				default:
 					wx.navigateTo({
-						url: url
+						url: url,
 					});
 			}
-		}
-	}
+		},
+	},
 });

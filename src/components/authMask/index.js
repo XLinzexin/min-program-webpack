@@ -1,24 +1,25 @@
-import { DELIVERY_ADDRESS_LIST } from "@/utils/constant";
+import { DELIVERY_ADDRESS_LIST } from '@/utils/constant';
+
 const { ajax, globalAction } = getApp();
 Component({
 	properties: {
 		scope: {
 			type: String,
-			value: ""
+			value: '',
 		},
 		isAsync: {
 			type: Boolean,
-			value: false
-		}
+			value: false,
+		},
 	},
 	data: {
 		hasAuth: false,
-		getAuth: false
+		getAuth: false,
 	},
 	attached() {
-		if (this.properties.scope === "userInfo") {
+		if (this.properties.scope === 'userInfo') {
 			this.setData({
-				userInfo: true
+				userInfo: true,
 			});
 		}
 		this.refreshScope();
@@ -31,28 +32,30 @@ Component({
 				this.toGetScope();
 			}
 		},
-		//获取用户信息
+		// 获取用户信息
 		async getUserInfo(authEvent) {
-			if (authEvent.detail.errMsg === "getUserInfo:ok") {
+			if (authEvent.detail.errMsg === 'getUserInfo:ok') {
 				const { isAsync } = this.data;
 				if (!isAsync) {
 					await globalAction.updateUserInfo();
-				} else {
+				}
+ else {
 					globalAction.updateUserInfo();
 				}
 				this.refreshScope();
 				this.runCallBack();
-			} else {
-				console.log("授权失败");
+			}
+ else {
+				console.log('授权失败');
 				this.refreshScope();
 			}
 		},
 		toGetScope() {
 			switch (this.properties.scope) {
-				case "address":
-					//获取地址权限
+				case 'address':
+					// 获取地址权限
 					wx.chooseAddress({
-						success: async info => {
+						success: async (info) => {
 							try {
 								let deliveryAddress =
 									wx.getStorageSync(DELIVERY_ADDRESS_LIST) || {};
@@ -67,67 +70,68 @@ Component({
 									}
 								}
 								if (!inStorage) {
-									const res = await ajax.post("/v1/address/create", {
+									const res = await ajax.post('/v1/address/create', {
 										provinceName: info.provinceName,
 										cityName: info.cityName,
 										countyName: info.countyName,
 										detailInfo: info.detailInfo,
 										customerName: info.userName,
-										customerPhone: info.telNumber
+										customerPhone: info.telNumber,
 									});
-									if (res.code) "createAddress fail";
+									if (res.code) 'createAddress fail';
 									const addressId = res.data;
 									deliveryAddress[addressId] = info;
 									wx.setStorageSync(
 										DELIVERY_ADDRESS_LIST,
-										Object.assign({}, deliveryAddress)
+										Object.assign({}, deliveryAddress),
 									);
 									info.addressId = Number(addressId);
 									this.runCallBack(info);
 								}
-							} catch (err) {
+							}
+ catch (err) {
 								console.warn(err);
 							}
 						},
-						fail: res => {
-							console.log("取消选择地址");
+						fail: (res) => {
+							console.log('取消选择地址');
 						},
-						complete: res => {
+						complete: (res) => {
 							this.refreshScope();
-						}
+						},
 					});
 					break;
-				case "invoiceTitle":
+				case 'invoiceTitle':
 					wx.chooseInvoiceTitle({
-						success: res => {
+						success: (res) => {
 							this.runCallBack(res);
 						},
-						fail: res => {
-							console.log("取消选择发票");
+						fail: (res) => {
+							console.log('取消选择发票');
 						},
-						complete: res => {
+						complete: (res) => {
 							this.refreshScope();
-						}
+						},
 					});
 					break;
 			}
 		},
-		//刷新当前权限获取状态
+		// 刷新当前权限获取状态
 		refreshScope() {
 			wx.getSetting({
-				success: res => {
+				success: (res) => {
 					let scope = res.authSetting[`scope.${this.properties.scope}`];
 					let { hasAuth, getAuth } = this.data;
-					if (typeof scope !== "undefined") {
+					if (typeof scope !== 'undefined') {
 						hasAuth = true;
 						getAuth = scope;
 					}
 					this.setData({ hasAuth, getAuth });
-				}
+				},
 			});
 		},
 		runCallBack(res) {
-			this.triggerEvent("callback", res);
-		}
-	}
+			this.triggerEvent('callback', res);
+		},
+	},
 });

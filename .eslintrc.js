@@ -13,7 +13,8 @@ module.exports = {
     "Component": true,
     "wx": true,
     "my": true,
-    "getApp": true
+    "getApp": true,
+    "getCurrentPages": true
   },
   "settings": {
     "import/resolver": {

@@ -1,23 +1,25 @@
 function image(url, width, height) {
-  if (!url) return "";
-  var testDomain = "https://testDomain.com";
-  var productDomain = "https://productDomain.com";
-  var testCdn = "https://testCdn.cn";
-  var productCdn = "https://productCdn.cn";
-  url = url.replace(testDomain, testCdn).replace(productDomain, productCdn);
-  var base = 0.8;
-  if (width) {
-    if (height) {
-      return `${url}?x-oss-process=image/resize,h_${Math.floor(
-        height * base
-      )},w_${Math.floor(width * base)},m_pad/format,jpg`;
-    } else {
-      return `${url}?x-oss-process=image/resize,w_${Math.floor(
-        width * base
-      )}/format,jpg`;
-    }
-  } else {
-    return url;
-  }
+	if (!url) return '';
+	var testDomain = 'https://testDomain.com';
+	var productDomain = 'https://productDomain.com';
+	var testCdn = 'https://testCdn.cn';
+	var productCdn = 'https://productCdn.cn';
+	url = url.replace(testDomain, testCdn).replace(productDomain, productCdn);
+	var base = 0.8;
+	if (width) {
+		if (height) {
+			return `${url}?x-oss-process=image/resize,h_${Math.floor(
+				height * base,
+			)},w_${Math.floor(width * base)},m_pad/format,jpg`;
+		}
+		else {
+			return `${url}?x-oss-process=image/resize,w_${Math.floor(
+				width * base,
+			)}/format,jpg`;
+		}
+	}
+	else {
+		return url;
+	}
 }
 module.exports = { image };

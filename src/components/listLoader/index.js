@@ -2,16 +2,16 @@
 const { ajax } = getApp();
 Component({
 	options: {
-		multipleSlots: true // 在组件定义时的选项中启用多slot支持
+		multipleSlots: true, // 在组件定义时的选项中启用多slot支持
 	},
 	properties: {
 		nomarl: {
 			type: Boolean,
-			value: false
-		}
+			value: false,
+		},
 	},
 	data: {
-		url: "",
+		url: '',
 		pageNumber: 0,
 		pageSize: 8,
 		params: {},
@@ -19,12 +19,12 @@ Component({
 		loadError: false,
 		allLoaded: false,
 		isEmpty: false,
-		method: "get",
+		method: 'get',
 
-		fliterData: null
+		fliterData: null,
 	},
 	methods: {
-		setRequestConfig: function(requestConfig) {
+		setRequestConfig: function (requestConfig) {
 			this.reset();
 			const defaultConfig = {
 				pageNumber: 0,
@@ -34,7 +34,7 @@ Component({
 				allLoaded: false,
 				isEmpty: false,
 				params: {},
-				method: "get"
+				method: 'get',
 			};
 			requestConfig = Object.assign(defaultConfig, requestConfig);
 			this.data.fliterData = requestConfig.fliterData;
@@ -48,22 +48,22 @@ Component({
 				this.nextPage();
 			}, 1000);
 		},
-		nextPage: function() {
+		nextPage: function () {
 			if (this.data.loading && this.data.pageNumber != 0) return 1;
-			if (this.data.url == "") return 2;
+			if (this.data.url == '') return 2;
 			if (this.data.allLoaded) return 3;
 			this.data.pageNumber++;
 			this.setData({
-				loading: true
+				loading: true,
 			});
 			this.getListData();
 		},
-		getListData: async function() {
+		getListData: async function () {
 			try {
 				const res = await ajax[this.data.method](this.data.url, {
 					...this.data.params,
 					pageNumber: this.data.pageNumber,
-					pageSize: this.data.pageSize
+					pageSize: this.data.pageSize,
 				});
 				if (!res.code) {
 					if (this.data.fliterData) {
@@ -73,68 +73,71 @@ Component({
 					if (this.data.pageNumber == 1 && this.data.loading) {
 						this.reset();
 					}
-					this.triggerEvent("render", {
+					this.triggerEvent('render', {
 						list: data,
-						pageNumber: this.data.pageNumber
+						pageNumber: this.data.pageNumber,
 					});
 					this.setData({
 						loading: false,
-						pageNumber: this.data.pageNumber
+						pageNumber: this.data.pageNumber,
 					});
 					if (this.data.pageNumber == 1 && data.length == 0) {
 						this.setData({
-							isEmpty: true
+							isEmpty: true,
 						});
 					}
 					if (parseInt(this.data.pageSize) > parseInt(data.length)) {
 						this.setData({
-							allLoaded: true
+							allLoaded: true,
 						});
 					}
-				} else {
+				}
+				else {
 					throw res.msg;
 				}
-			} catch (err) {
+			}
+			catch (err) {
 				console.error(err, 123);
 				this.setData({
 					loading: false,
-					loadError: true
+					loadError: true,
 				});
 			}
 		},
-		reload: function() {
+		reload: function () {
 			this.data.pageNumber--;
 			this.setData({
-				loadError: false
+				loadError: false,
 			});
 			this.nextPage();
 		},
-		reset: function() {
+		reset: function () {
 			this.Page.setData({
-				list: []
+				list: [],
 			});
 		},
-		empty: function() {
+		empty: function () {
 			this.setData({
-				isEmpty: true
+				isEmpty: true,
 			});
-		}
+		},
 	},
-	created: function() {},
-	attached: function() {
+	created: function () {},
+	attached: function () {
 		let _this = this;
 		let pages = getCurrentPages();
 		let curPage = pages[pages.length - 1];
 		if (curPage.onReachBottom) {
 			var onReachBottom = curPage.onReachBottom;
-			curPage.onReachBottom = function(options) {
+			curPage.onReachBottom = function (options) {
 				_this.nextPage();
 				onReachBottom.call(this, options);
 			};
-		} else {
-			curPage.onReachBottom = function(options) {
+		}
+		else {
+			curPage.onReachBottom = function (options) {
 				_this.nextPage();
 			};
 		}
-	}
+	},
 });
