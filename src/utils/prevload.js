@@ -1,6 +1,6 @@
 import { parseQueryString } from '@/utils/util';
 // 重写所有路由跳转的方法
-const navigatesBackup = ['navigateTo', 'reLaunch', 'navigateTo', 'switchTab'];
+const navigatesBackup = ['navigateTo', 'reLaunch', 'redirectTo', 'switchTab'];
 for (let item of navigatesBackup) {
 	const navigate = wx[item];
 	delete wx[item];
