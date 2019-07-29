@@ -7,17 +7,17 @@ import {
 	readdir,
 } from 'fs-extra';
 import { resolve, dirname, relative, join, parse } from 'path';
-import { optimize, LoaderTargetPlugin, JsonpTemplatePlugin } from 'webpack';
+import webpack, { LoaderTargetPlugin, optimize } from 'webpack';
 import { ConcatSource } from 'webpack-sources';
 import globby from 'globby';
 import { defaults, values, uniq } from 'lodash';
 import MultiEntryPlugin from 'webpack/lib/MultiEntryPlugin';
 import SingleEntryPlugin from 'webpack/lib/SingleEntryPlugin';
+import JsonpTemplatePlugin from 'webpack/lib/web/JsonpTemplatePlugin';
 import FunctionModulePlugin from 'webpack/lib/FunctionModulePlugin';
 import NodeSourcePlugin from 'webpack/lib/node/NodeSourcePlugin';
-import { K } from 'handlebars';
 
-const { CommonsChunkPlugin } = optimize;
+const { SplitChunksPlugin } = optimize;
 
 const deprecated = function deprecated(obj, key, adapter, explain) {
 	if (deprecated.warned.has(key)) {
@@ -40,12 +40,10 @@ const stripExt = (path) => {
 
 const miniProgramTarget = (compiler) => {
 	const { options } = compiler;
-	compiler.apply(
-		new JsonpTemplatePlugin(options.output),
-		new FunctionModulePlugin(options.output),
-		new NodeSourcePlugin(options.node),
-		new LoaderTargetPlugin('web'),
-	);
+	new JsonpTemplatePlugin(options.output).apply(compiler);
+	new FunctionModulePlugin(options.output).apply(compiler);
+	new NodeSourcePlugin(options.node).apply(compiler);
+	new LoaderTargetPlugin('web').apply(compiler);
 };
 
 export const Targets = {
@@ -85,7 +83,7 @@ export default class WXAppPlugin {
 			'Option `forceTarge` is deprecated. Please use `enforceTarget` instead',
 		);
 
-		this.options.extensions = uniq([...this.options.extensions, '.js']);
+		this.options.extensions = uniq([...this.options.extensions, '.ts']);
 		this.options.include = [].concat(this.options.include);
 		this.options.exclude = [].concat(this.options.exclude);
 		this.globalComponets = {};
@@ -94,77 +92,55 @@ export default class WXAppPlugin {
 	apply(compiler) {
 		const { clear } = this.options;
 		let isFirst = true;
-
 		this.enforceTarget(compiler);
-
-		compiler.plugin(
+		let keys = [];
+		for (let key in compiler.hooks) {
+			keys.push(key);
+		}
+		compiler.hooks.run.tapAsync(
 			'run',
-			this.try(async (compiler) => {
-				await this.run(compiler);
-			}),
+			async (compiler, callback) => {
+				await this.run(compiler, callback);
+			},
 		);
 
-		compiler.plugin(
+		compiler.hooks.watchRun.tapAsync(
 			'watch-run',
-			this.try(async (compiler) => {
-				await this.run(compiler.compiler);
-			}),
+			async (compiler, callback) => {
+				await this.run(compiler, callback);
+			},
 		);
 
-		compiler.plugin(
+		compiler.hooks.emit.tapAsync(
 			'emit',
-			this.try(async (compilation) => {
+			async (compilation, callback) => {
 				if (clear && isFirst) {
 					isFirst = false;
 					await this.clear(compilation);
 				}
 
 				await this.toEmitTabBarIcons(compilation);
-
-				// for (let k in compilation.assets) {
-				// 	if (this.pageChildrenList.includes(k)) {
-				// 		let jsonFile = k;
-				// 		const json = await readJson(`${this.base}/${k}`);
-				// 		const jsonPethDeep = jsonFile.split("/");
-				// 		const jsonComponents = {};
-				// 		for (let k in this.globalComponets) {
-				// 			let beforePath = "/";
-				// 			jsonComponents[k] = `${beforePath}${this.globalComponets[k]}`;
-				// 		}
-				// 		json.usingComponents = Object.assign(
-				// 			json.usingComponents || {},
-				// 			jsonComponents
-				// 		);
-
-				// 		const jsonText = JSON.stringify(json);
-				// 		compilation.assets[k] = {
-				// 			source: function() {
-				// 				return jsonText;
-				// 			},
-				// 			size: function() {
-				// 				return jsonText.length;
-				// 			}
-				// 		};
-				// 	}
-				// }
-			}),
+				callback();
+			},
 		);
 
-		compiler.plugin(
+		compiler.hooks.afterEmit.tapAsync(
 			'after-emit',
-			this.try(async (compilation) => {
+			async (compilation, callback) => {
 				await this.toAddTabBarIconsDependencies(compilation);
-			}),
+				callback();
+			},
 		);
 	}
 
 	try = (handler) => async (arg, callback) => {
 		try {
 			await handler(arg);
-			callback();
+			// callback();
 		}
 		catch (err) {
-			callback(err);
+			// callback(err);
+			throw err;
 		}
 	};
 
@@ -232,7 +208,7 @@ export default class WXAppPlugin {
 			return dirname(entryFromCompiler);
 		}
 
-		return context;
+		return `${context}/src`;
 	}
 
 	async getTabBarIcons(tabBar) {
@@ -269,9 +245,10 @@ export default class WXAppPlugin {
 
 	toAddTabBarIconsDependencies(compilation) {
 		const { fileDependencies } = compilation;
+		this.tabBarIcons = this.tabBarIcons || [];
 		this.tabBarIcons.forEach((iconPath) => {
-			if (!~fileDependencies.indexOf(iconPath)) {
-				fileDependencies.push(iconPath);
+			if (!fileDependencies.has(iconPath)) {
+				fileDependencies.add(iconPath);
 			}
 		});
 	}
@@ -351,7 +328,7 @@ export default class WXAppPlugin {
 	}
 
 	addEntries(compiler, entries, chunkName) {
-		compiler.apply(new MultiEntryPlugin(this.base, entries, chunkName));
+		new MultiEntryPlugin(this.base, entries, chunkName).apply(compiler);
 	}
 
 	async compileAssets(compiler) {
@@ -359,8 +336,8 @@ export default class WXAppPlugin {
 			options: { include, exclude, dot, assetsChunkName, extensions },
 			entryResources,
 		} = this;
-		compiler.plugin('compilation', (compilation) => {
-			compilation.plugin('before-chunk-assets', () => {
+		compiler.hooks.compilation.tap('compilation', (compilation) => {
+			compilation.hooks.buildModule.tap('before-chunk-assets', () => {
 				const assetsChunkIndex = compilation.chunks.findIndex(
 					({ name }) => name === assetsChunkName,
 				);
@@ -409,23 +386,21 @@ export default class WXAppPlugin {
 			entryResources,
 		} = this;
 		const scripts = entryResources.map(this.getFullScriptPath.bind(this));
-
-		compiler.apply(
-			new CommonsChunkPlugin({
-				name: stripExt(commonModuleName),
-				minChunks: ({ resource }) => {
-					if (resource) {
-						const regExp = this.getChunkResourceRegExp();
-						return regExp.test(resource) && scripts.indexOf(resource) < 0;
-					}
-					return false;
-				},
-			}),
-		);
+		new SplitChunksPlugin({
+			name: stripExt(commonModuleName),
+			runtimeChunk: 'multiple',
+			minChunks: ({ resource }) => {
+				if (resource) {
+					const regExp = this.getChunkResourceRegExp();
+					return regExp.test(resource) && scripts.indexOf(resource) < 0;
+				}
+				return false;
+			},
+		}).apply(compiler);
 	}
 
 	addScriptEntry(compiler, entry, name) {
-		compiler.plugin('make', (compilation, callback) => {
+		compiler.hooks.make.tapAsync('makeAddScriptEntry', (compilation, callback) => {
 			const dep = SingleEntryPlugin.createDependency(entry, name);
 			compilation.addEntry(this.base, dep, name, callback);
 		});
@@ -450,9 +425,14 @@ export default class WXAppPlugin {
 		const { target } = compilation.options;
 		const commonChunkName = stripExt(commonModuleName);
 		const globalVar = 'global';
+		let template = [];
+		for (let k in compilation) {
+			template.push(k);
+		}
+		// console.log(template);
 
 		// inject chunk entries
-		compilation.chunkTemplate.plugin('render', (core, { name }) => {
+		compilation.mainTemplate.hooks.render.tap('renderJs', (core, { name }) => {
 			if (this.entryResources.indexOf(name) >= 0) {
 				const relativePath = relative(dirname(name), `./${commonModuleName}`);
 				const posixPath = relativePath.replace(/\\/g, '/');
@@ -478,7 +458,7 @@ export default class WXAppPlugin {
 		});
 
 		// replace `window` to `global` in common chunk
-		compilation.mainTemplate.plugin('bootstrap', (source, chunk) => {
+		compilation.mainTemplate.hooks.bootstrap.tap('bootstrap', (source, chunk) => {
 			const windowRegExp = new RegExp('window', 'g');
 			if (chunk.name === commonChunkName) {
 				return source.replace(windowRegExp, globalVar);
@@ -487,18 +467,19 @@ export default class WXAppPlugin {
 		});
 
 		// override `require.ensure()`
-		compilation.mainTemplate.plugin(
+		compilation.mainTemplate.hooks.requireEnsure.tap(
 			'require-ensure',
 			() => 'throw new Error("Not chunk loading available");',
 		);
 	}
 
-	async run(compiler) {
+	async run(compiler, callback) {
 		this.base = this.getBase(compiler);
 		this.entryResources = await this.getEntryResource();
-		compiler.plugin('compilation', this.toModifyTemplate.bind(this));
+		compiler.hooks.compilation.tap('toModifyTemplate', this.toModifyTemplate.bind(this));
 		this.compileScripts(compiler);
 		await this.compileAssets(compiler);
+		callback();
 	}
 	async fileDisplay(filePath, callback) {
 		// 根据文件路径读取文件，返回文件列表

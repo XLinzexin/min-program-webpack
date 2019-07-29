@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import {
+import webpack, {
 	DefinePlugin,
 	EnvironmentPlugin,
 	IgnorePlugin,
@@ -10,9 +10,7 @@ import StylelintPlugin from 'stylelint-webpack-plugin';
 import MinifyPlugin from 'babel-minify-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import pkg from './package.json';
-import WXAppComponentPlugin, {
-	Targets,
-} from './webpack-plugin/wxapp-components-plugin/index';
+import WXAppComponentPlugin from './webpack-plugin/wxapp-components-plugin/index';
 
 var ImageminPlugin = require('imagemin-webpack-plugin').default;
 
@@ -60,14 +58,14 @@ export default (env = {}) => {
 			publicPath: '/',
 			path: resolve('dist'),
 		},
-		target: Targets[target],
+		target: (compiler) => compiler.apply(new webpack.LoaderTargetPlugin(env.target || 'Wechat')),
 		module: {
 			rules: [
 				{
 					test: /\.js$/,
 					include: /src/,
 					exclude: /node_modules/,
-					use: ['babel-loader', shouldLint && 'eslint-loader'].filter(Boolean),
+					use: ['babel-loader', shouldLint && 'eslint-loader', 'source-map-loader'].filter(Boolean),
 				},
 				{
 					test: /\.wxs$/,
@@ -93,11 +91,26 @@ export default (env = {}) => {
 					],
 				},
 				{
-					test: /\.(json|png|jpg|gif)$/,
+					test: /\.(png|jpg|gif)$/,
 					include: /src/,
-					use: relativeFileLoader(),
+					use: [
+						relativeFileLoader(),
+					],
+				},
+
+				{
+					test: /\.json$/,
+					use: [
+						relativeFileLoader(),
+					],
 				},
 				{
+					test: /\.json$/,
+					type: 'javascript/auto',
+					include: /src/,
+					loader: resolve('webpack-plugin/json-loader.js'),
+				},
+				 {
 					test: /\.(wxml|axml)$/,
 					include: /src/,
 					use: [
@@ -107,6 +120,18 @@ export default (env = {}) => {
 							options: {
 								root: srcDir,
 								enforceRelativePath: true,
+							},
+						},
+					],
+				},
+				{
+					test: /\.(wxml|axml)$/,
+					include: /src\/pages/,
+					use: [
+						{
+							loader: resolve('webpack-plugin/add-wxml-loader.js'),
+							options: {
+								wxml: '<global-component id="globalComponent"/>',
 							},
 						},
 					],
@@ -144,7 +169,7 @@ export default (env = {}) => {
 		].filter(Boolean),
 		devtool: isDev ? 'source-map' : false,
 		resolve: {
-			extensions: ['.js', 'wxss', 'less', '.json'],
+			extensions: ['.js', 'wxss', 'less', '.json', '.webpack.js', '.web.js'],
 			alias: {
 				'@': resolve('src'),
 			},
